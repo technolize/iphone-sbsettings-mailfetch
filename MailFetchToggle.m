@@ -19,6 +19,10 @@ BOOL isEnabled() {
   return [[pref objectForKey:@"PCDefaultPollInterval"] boolValue];
 }
 
+BOOL getStateFast() {
+  return isEnabled();
+}
+
 void setState(BOOL enable) {
   NSMutableDictionary *pref = [NSMutableDictionary dictionaryWithContentsOfFile:PREF_FILE];
   NSMutableDictionary *tmp;
