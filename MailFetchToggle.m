@@ -15,8 +15,10 @@ BOOL isCapable() {
 }
 
 BOOL isEnabled() {
-  NSDictionary *pref = [NSDictionary dictionaryWithContentsOfFile:PREF_FILE];
-  return [[pref objectForKey:@"PCDefaultPollInterval"] boolValue];
+  NSDictionary *pref = [[NSDictionary alloc] initWithContentsOfFile:PREF_FILE];
+  BOOL flag = [[pref objectForKey:@"PCDefaultPollInterval"] boolValue];
+  [pref release];
+  return flag;
 }
 
 BOOL getStateFast() {
@@ -24,29 +26,27 @@ BOOL getStateFast() {
 }
 
 void setState(BOOL enable) {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSMutableDictionary *pref = [NSMutableDictionary dictionaryWithContentsOfFile:PREF_FILE];
   NSMutableDictionary *tmp;
+  NSNumber *interval;
   
-  if (enable == YES) {
-    NSNumber *interval;
+  if (enable) {
     tmp = [NSMutableDictionary dictionaryWithContentsOfFile:TMP_FILE];
-    
-    if (tmp == nil) {
+    interval = [tmp objectForKey:@"interval"];
+    if (interval == nil || [interval intValue] < 900)
       interval = [NSNumber numberWithInt:900];
-    }
-    else {
-      interval = [tmp objectForKey:@"interval"];
-    }
-    
-    [pref setValue:interval forKey:@"PCDefaultPollInterval"];
   }
   else {
-    tmp = [NSMutableDictionary dictionaryWithObject:[pref objectForKey:@"PCDefaultPollInterval"] forKey:@"interval"];
+    interval = [NSNumber numberWithInt:0];
+    tmp = [NSMutableDictionary dictionaryWithObject:[pref objectForKey:@"PCDefaultPollInterval"]
+                                             forKey:@"interval"];
     [tmp writeToFile:TMP_FILE atomically:YES];
-    [pref setValue:[NSNumber numberWithInt:0] forKey:@"PCDefaultPollInterval"];
   }
   
+  [pref setValue:interval forKey:@"PCDefaultPollInterval"];
   [pref writeToFile:PREF_FILE atomically:YES];
+  [pool release];
 }
 
 float getDelayTime() {
