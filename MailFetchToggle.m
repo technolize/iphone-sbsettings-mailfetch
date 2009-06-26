@@ -7,7 +7,11 @@
 
 #import <Foundation/Foundation.h>
 
-#define PREF_FILE @"/var/mobile/Library/Preferences/com.apple.persistentconnection.plist"
+#if __IPHONE_OS_VERSION_MIN_REQUIRED > __IPHONE_2_2
+  #define PREF_FILE @"/var/mobile/Library/Preferences/com.apple.persistentconnection-mcc.plist"
+#else
+  #define PREF_FILE @"/var/mobile/Library/Preferences/com.apple.persistentconnection.plist"
+#endif
 #define TMP_FILE @"/var/mobile/Library/SBSettings/Toggles/MailFetch/interval.plist"
 
 BOOL isCapable() {
